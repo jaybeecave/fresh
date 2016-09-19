@@ -15,7 +15,7 @@ package main
 import (
 	"flag"
 
-	"github.com/pressly/fresh/runner"
+	"github.com/jaybeecave/fresh/runner"
 )
 
 func main() {
