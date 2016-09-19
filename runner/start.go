@@ -11,6 +11,7 @@ var (
 	stopChannel  chan bool
 	mainLog      logFunc
 	watcherLog   logFunc
+	sassLog      logFunc
 	runnerLog    logFunc
 	buildLog     logFunc
 	appLog       logFunc
@@ -72,6 +73,7 @@ func init() {
 func initLogFuncs() {
 	mainLog = newLogFunc("main")
 	watcherLog = newLogFunc("watcher")
+	sassLog = newLogFunc("sass")
 	runnerLog = newLogFunc("runner")
 	buildLog = newLogFunc("build")
 	appLog = newLogFunc("app")
