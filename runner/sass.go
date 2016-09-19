@@ -2,9 +2,7 @@ package runner
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -47,67 +45,53 @@ func serveSass(sassFilepath string) {
 			libsass.IncludePaths([]string{filepath.Join(wd)}),
 			// libsass.LineComments(true),
 			// libsass.Comments(true),
-			libsass.SourceMap(true, requestFile+".map"),
+			libsass.SourceMap(true, cssFilepath+".map"),
 			// libsass.OutputStyle(1),
 		)
 		if err != nil {
 			log.Printf("ERROR: libsass error: %#v", err.Error())
-			http.Error(w, err.Error(), 500)
-			return
+			panic(err)
 		}
 
 		if err = comp.Run(); err != nil {
 			log.Printf("ERROR: libsass compile error: %#v", err.Error())
-			http.Error(w, err.Error(), 500)
-			return
+			panic(err)
 		}
 		out.Close()
 	}
-
-	// buffer := []byte("asdfhfhkj")
-	// buffer := bytes.NewBuffer(nil)
-	// io.Copy(buffer, out)
-
-	buffer, err := ioutil.ReadFile(requestFile)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
-
-	w.Header().Set("Content-Type", "text/css")
-	w.Write(buffer)
 }
 
-// Compile sass files using wellington
-func buildSass() {
-	const sassdir = "assets/stylesheets/"
+// // Compile sass files using wellington
+// func buildSass() {
+// 	const sassdir = "assets/stylesheets/"
 
-	// open input sass/scss file to be compiled
-	fi, err := os.Open(sassdir + "test.scss")
-	if err != nil {
-		panic(err)
-	}
-	defer fi.Close()
+// 	// open input sass/scss file to be compiled
+// 	fi, err := os.Open(sassdir + "test.scss")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer fi.Close()
 
-	// create output css file
-	fo, err := os.Create(sassdir + "style.css")
-	if err != nil {
-		panic(err)
-	}
-	defer fo.Close()
+// 	// create output css file
+// 	fo, err := os.Create(sassdir + "style.css")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer fo.Close()
 
-	// options for compilation
-	p := libsass.IncludePaths([]string{sassdir})
-	s := libsass.OutputStyle(libsass.COMPRESSED_STYLE)
-	m := libsass.SourceMap(true, sassdir+"style.css.map")
+// 	// options for compilation
+// 	p := libsass.IncludePaths([]string{sassdir})
+// 	s := libsass.OutputStyle(libsass.COMPRESSED_STYLE)
+// 	m := libsass.SourceMap(true, sassdir+"style.css.map")
 
-	// create a new compiler with options
-	comp, err := libsass.New(fo, fi, p, s, m)
-	if err != nil {
-		panic(err)
-	}
+// 	// create a new compiler with options
+// 	comp, err := libsass.New(fo, fi, p, s, m)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	// start compile
-	if err := comp.Run(); err != nil {
-		panic(err)
-	}
-}
+// 	// start compile
+// 	if err := comp.Run(); err != nil {
+// 		panic(err)
+// 	}
+// }
