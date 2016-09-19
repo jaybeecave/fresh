@@ -1,72 +1,80 @@
 package runner
 
 import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
+	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/wellington/go-libsass"
 )
 
-func serveSass() {
+func serveSass(sassFilepath string) {
+	sassLog("processing " + sassFilepath)
 	// wd, _ := os.Getwd()
 	// requestFile := filepath.Join(wd, reader.URL.Path)
 	// sourceFile := strings.TrimSuffix(requestFile, ".css") + ".scss"
 
-	// if path.Ext(reader.URL.Path) == ".scss" {
-	// 	requestFile = strings.TrimSuffix(requestFile, ".scss") + ".css"
-	// 	requestFile = strings.Replace(requestFile, "/sass/", "/stylesheets/", 1)
-	// 	sourceFile = filepath.Join(wd, reader.URL.Path)
+	if path.Ext(sassFilepath) == ".scss" {
+		cssFilepath := strings.TrimSuffix(sassFilepath, ".scss") + ".css"
+		cssFilepath = strings.Replace(cssFilepath, "/sass/", "/stylesheets/", 1)
+		// sourceFile := filepath.Join(wd, reader.URL.Path)
 
-	// 	// if path.Ext(reader.URL.Path) != ".css" {
-	// 	// 	return
-	// 	// }
+		// if path.Ext(reader.URL.Path) != ".css" {
+		// 	return
+		// }
 
-	// 	fmt.Println(sourceFile)
+		fmt.Println(sassFilepath)
 
-	// 	fi, err := os.Open(sourceFile)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	defer fi.Close()
-	// 	out, err := os.Create(requestFile)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	defer out.Close()
+		fi, err := os.Open(sassFilepath)
+		if err != nil {
+			panic(err)
+		}
+		defer fi.Close()
+		out, err := os.Create(cssFilepath)
+		if err != nil {
+			panic(err)
+		}
+		defer out.Close()
 
-	// 	comp, err := libsass.New(out, fi,
-	// 		libsass.Path(sourceFile),
-	// 		libsass.OutputStyle(libsass.COMPRESSED_STYLE),
-	// 		libsass.IncludePaths([]string{filepath.Join(wd)}),
-	// 		// libsass.LineComments(true),
-	// 		// libsass.Comments(true),
-	// 		libsass.SourceMap(true, requestFile+".map"),
-	// 		// libsass.OutputStyle(1),
-	// 	)
-	// 	if err != nil {
-	// 		log.Printf("ERROR: libsass error: %#v", err.Error())
-	// 		http.Error(w, err.Error(), 500)
-	// 		return
-	// 	}
+		comp, err := libsass.New(out, fi,
+			libsass.Path(sassFilepath),
+			libsass.OutputStyle(libsass.COMPRESSED_STYLE),
+			libsass.IncludePaths([]string{filepath.Join(wd)}),
+			// libsass.LineComments(true),
+			// libsass.Comments(true),
+			libsass.SourceMap(true, requestFile+".map"),
+			// libsass.OutputStyle(1),
+		)
+		if err != nil {
+			log.Printf("ERROR: libsass error: %#v", err.Error())
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
-	// 	if err = comp.Run(); err != nil {
-	// 		log.Printf("ERROR: libsass compile error: %#v", err.Error())
-	// 		http.Error(w, err.Error(), 500)
-	// 		return
-	// 	}
-	// 	out.Close()
-	// }
+		if err = comp.Run(); err != nil {
+			log.Printf("ERROR: libsass compile error: %#v", err.Error())
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		out.Close()
+	}
 
-	// // buffer := []byte("asdfhfhkj")
-	// // buffer := bytes.NewBuffer(nil)
-	// // io.Copy(buffer, out)
+	// buffer := []byte("asdfhfhkj")
+	// buffer := bytes.NewBuffer(nil)
+	// io.Copy(buffer, out)
 
-	// buffer, err := ioutil.ReadFile(requestFile)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), 500)
-	// }
+	buffer, err := ioutil.ReadFile(requestFile)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 
-	// w.Header().Set("Content-Type", "text/css")
-	// w.Write(buffer)
+	w.Header().Set("Content-Type", "text/css")
+	w.Write(buffer)
 }
 
 // Compile sass files using wellington
