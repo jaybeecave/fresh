@@ -20,6 +20,7 @@ func watch() {
 			case ev := <-watcher.Event:
 				if isWatchedFile(ev.Name) && !ev.IsAttrib() {
 					watcherLog("sending event %s", ev)
+					sassLog("sending event %s", ev)
 					startChannel <- ev.String()
 				}
 			case err := <-watcher.Error:

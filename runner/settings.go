@@ -43,7 +43,7 @@ var (
 		BuildArgs:       "",
 		RunArgs:         "",
 		BuildLog:        "runner-build-errors.log",
-		ValidExtensions: []string{".go", ".tpl", ".tmpl", ".html"},
+		ValidExtensions: []string{".go", ".tpl", ".tmpl", ".html", ".scss"},
 		BuildDelay:      600,
 		Colors:          true,
 		LogColorMain:    "cyan",

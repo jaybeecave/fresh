@@ -37,6 +37,7 @@ func start() {
 		for {
 			eventName := <-startChannel
 			mainLog("receiving first event %s", eventName)
+			sassLog("did some sass")
 
 			mainLog("sleeping for %d milliseconds", buildDelay/time.Millisecond)
 			time.Sleep(buildDelay)
