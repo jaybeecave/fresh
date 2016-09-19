@@ -26,6 +26,7 @@ type config struct {
 	LogColorBuild   string   `toml:"log_color_build"`
 	LogColorRunner  string   `toml:"log_color_runner"`
 	LogColorWatcher string   `toml:"log_color_watcher"`
+	LogColorSass    string   `toml:"log_color_sass"`
 	LogColorApp     string   `toml:"log_color_app"`
 
 	BuildErrorPath string `toml:"build_error_log"`
@@ -49,6 +50,7 @@ var (
 		LogColorBuild:   "yellow",
 		LogColorRunner:  "green",
 		LogColorWatcher: "magenta",
+		LogColorSass:    "blue",
 	}
 	colors = map[string]string{
 		"reset":          "0",
@@ -123,8 +125,10 @@ func logColor(logName string) string {
 		return colors[settings.LogColorBuild]
 	case "runner":
 		return colors[settings.LogColorRunner]
-	case "watcher":
+	case "watching":
 		return colors[settings.LogColorWatcher]
+	case "sass":
+		return colors[settings.LogColorSass]
 	default:
 		return colors[settings.LogColorApp]
 	}
