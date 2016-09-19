@@ -125,7 +125,7 @@ func logColor(logName string) string {
 		return colors[settings.LogColorBuild]
 	case "runner":
 		return colors[settings.LogColorRunner]
-	case "watching":
+	case "watcher":
 		return colors[settings.LogColorWatcher]
 	case "sass":
 		return colors[settings.LogColorSass]
