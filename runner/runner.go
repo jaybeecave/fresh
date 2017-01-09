@@ -3,6 +3,7 @@ package runner
 import (
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -17,6 +18,7 @@ func run() bool {
 	if err != nil {
 		fatal(err)
 	}
+	runnerLog("pid: " + strconv.Itoa(cmd.Process.Pid))
 	runnerLog(strings.Repeat("-", 20))
 
 	go func() {

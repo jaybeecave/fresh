@@ -2,7 +2,9 @@ package runner
 
 import (
 	"os"
+	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -36,9 +38,10 @@ func start() {
 	go func() {
 		for {
 			eventName := <-startChannel
+			filePath := getFilePath(eventName)
+			fileName := getFileName(filePath)
+
 			mainLog("receiving first event %s", eventName)
-			workingDir, _ := os.Getwd()
-			sassLog("did some sass" + workingDir)
 
 			mainLog("sleeping for %d milliseconds", buildDelay/time.Millisecond)
 			time.Sleep(buildDelay)
@@ -52,7 +55,21 @@ func start() {
 				mainLog(err.Error())
 			}
 
+			// if its sass do it here
+			sassLog("xx:" + filePath)
+			sassLog("xxx:" + fileName)
+			if filepath.Ext(filePath) == ".scss" {
+				errorMessage, ok := buildSass(filePath)
+				if ok {
+					sassLog("processed:" + fileName)
+				} else {
+					sassLog(errorMessage)
+				}
+				continue
+			}
+
 			errorMessage, ok := build()
+
 			if !ok {
 				createBuildErrorsLog(errorMessage)
 			} else {
@@ -98,4 +115,15 @@ func Start(confFile, buildArgs, runArgs, buildPath, outputBinary *string, watchL
 	startChannel <- "/"
 
 	select {}
+}
+
+func getFilePath(eventName string) (path string) {
+	path = strings.Split(eventName, "\": MODIFY")[0]
+	path = strings.Replace(path, `"`, "", 1)
+	return path
+}
+func getFileName(path string) (fileName string) {
+	parts := strings.Split(path, `/`)
+	lastIndex := len(parts) - 1
+	return parts[lastIndex]
 }
