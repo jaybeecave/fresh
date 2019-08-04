@@ -14,21 +14,35 @@ package main
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/jaybeecave/fresh/runner"
 )
+
+type flagStringSlice []string
+
+func (f *flagStringSlice) String() string {
+	return fmt.Sprintf("%v", *f)
+}
+
+func (f *flagStringSlice) Set(value string) error {
+	*f = append(*f, value)
+	return nil
+}
 
 func main() {
 	var watchList, excludeList runner.Multiflag
 
 	configPath := flag.String("c", "", "config file path")
 	buildArgs := flag.String("b", "", "build command line arguments")
-	runArgs := flag.String("r", "", "run command line arguments")
+	var runArgs flagStringSlice
+	flag.Var(&runArgs, "r", "run command line arguments")
 	buildPath := flag.String("p", "", "root path - package that will be built & ran")
 	outputBinary := flag.String("o", "", "output (built) binary location")
+	tmpPath := flag.String("t", "", "tmp path")
 	flag.Var(&watchList, "w", "watch path (recursive), repeat multiple times to watch multiple paths")
 	flag.Var(&excludeList, "e", "exclude path (recursive), repeat multiple times to exclude multiple paths")
 	flag.Parse()
 
-	runner.Start(configPath, buildArgs, runArgs, buildPath, outputBinary, watchList, excludeList)
+	runner.Start(configPath, buildArgs, runArgs, buildPath, outputBinary, tmpPath, watchList, excludeList)
 }

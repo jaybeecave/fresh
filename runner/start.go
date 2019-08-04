@@ -56,8 +56,8 @@ func start() {
 			}
 
 			// if its sass do it here
-			sassLog("xx:" + filePath)
-			sassLog("xxx:" + fileName)
+			sassLog("fullpath:" + filePath)
+			sassLog("filename:" + fileName)
 			if filepath.Ext(filePath) == ".scss" {
 				errorMessage, ok := buildSass(filePath)
 				if ok {
@@ -100,15 +100,15 @@ func initLogFuncs() {
 
 // Start watches for file changes in the root directory.
 // After each file system event it builds and (re)starts the application.
-func Start(confFile, buildArgs, runArgs, buildPath, outputBinary *string, watchList, excludeList Multiflag) {
+func Start(confFile, buildArgs *string, runArgs []string, buildPath, outputBinary, tmpPath *string, watchList, excludeList Multiflag) {
 	os.Setenv("DEV_RUNNER", "1")
 	initLimit()
-	err := initSettings(confFile, buildArgs, runArgs, buildPath, outputBinary, watchList, excludeList)
+	initLogFuncs()
+	err := initSettings(confFile, buildArgs, runArgs, buildPath, outputBinary, tmpPath, watchList, excludeList)
 	if err != nil {
 		logger.Fatalf("Failed to start: %v", err)
 		return
 	}
-	initLogFuncs()
 	initFolders()
 	watch()
 	start()

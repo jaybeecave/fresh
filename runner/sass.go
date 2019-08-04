@@ -22,8 +22,11 @@ func buildSass(sassFilepath string) (string, bool) {
 	if err != nil {
 		return err.Error(), false
 	}
+
 	cssFilepath := strings.TrimSuffix(sassFilepath, ".scss") + ".css"
-	cssFilepath = strings.Replace(cssFilepath, "/sass/", "/css/", 1)
+	cssFilepath = strings.Replace(cssFilepath, "/scss/", "/css/", 1)
+	sassLog("scss input " + sassFilepath)
+	sassLog("css output" + cssFilepath)
 
 	fi, err := os.Open(sassFilepath)
 	if err != nil {
@@ -42,7 +45,7 @@ func buildSass(sassFilepath string) (string, bool) {
 		libsass.IncludePaths([]string{filepath.Join(wd)}),
 		// libsass.LineComments(true),
 		// libsass.Comments(true),
-		libsass.SourceMap(true, cssFilepath+".map"),
+		libsass.SourceMap(true, cssFilepath+".map", ""),
 		// libsass.OutputStyle(1),
 	)
 	if err != nil {

@@ -17,7 +17,7 @@ type config struct {
 	ConfigPath      string   `toml:"config_path"`
 	TmpPath         string   `toml:"tmp_path"`
 	BuildArgs       string   `toml:"build_args"`
-	RunArgs         string   `toml:"run_args"`
+	RunArgs         []string `toml:"run_args"`
 	BuildLog        string   `toml:"build_log"`
 	ValidExtensions []string `toml:"valid_ext"`
 	BuildDelay      int32    `toml:"build_delay"`
@@ -41,7 +41,7 @@ var (
 		ConfigPath:      "./runner.conf",
 		TmpPath:         "./tmp",
 		BuildArgs:       "",
-		RunArgs:         "",
+		RunArgs:         []string{},
 		BuildLog:        "runner-build-errors.log",
 		ValidExtensions: []string{".go", ".tpl", ".tmpl", ".html", ".scss"},
 		BuildDelay:      600,
@@ -81,31 +81,42 @@ var (
 	}
 )
 
-func initSettings(confFile, buildArgs, runArgs, buildPath, outputBinary *string, watchList, excludeList Multiflag) error {
+func initSettings(confFile, buildArgs *string, runArgs []string, buildPath, outputBinary, tmpPath *string, watchList, excludeList Multiflag) error {
 	defer buildPaths()
 
+	confFileExists := true
 	if *confFile != "" {
 		if _, err := os.Stat(*confFile); os.IsNotExist(err) {
 			return fmt.Errorf("Config file %s does not exist", *confFile)
 		}
 		settings.ConfigPath = *confFile
+	} else {
+		if _, err := os.Stat(settings.ConfigPath); os.IsNotExist(err) {
+			confFileExists = false
+		}
+	}
 
+	if confFileExists {
 		if _, err := toml.DecodeFile(settings.ConfigPath, &settings); err != nil {
 			return fmt.Errorf("Reading config file failed: %v", err)
 		}
+		runnerLog("Loaded config file: %s", settings.ConfigPath)
+	} else {
+		runnerLog("Loaded default config")
 	}
 
 	if *buildArgs != "" {
 		settings.BuildArgs = *buildArgs
 	}
-	if *runArgs != "" {
-		settings.RunArgs = *runArgs
-	}
+	settings.RunArgs = []string(runArgs)
 	if *buildPath != "" {
 		settings.Root = *buildPath
 	}
 	if *outputBinary != "" {
 		settings.OutputBinary = *outputBinary
+	}
+	if *tmpPath != "" {
+		settings.TmpPath = *tmpPath
 	}
 	if len(watchList) > 0 {
 		settings.WatchPaths = append(settings.WatchPaths, watchList...)
